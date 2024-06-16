@@ -350,7 +350,6 @@ void FrameDrawer::DrawYOLO(cv::Mat &img, std::vector<OutputParams> result, std::
 	}
     
     cv::Mat mask = img.clone();
-    std::cout<<result.size()<<std::endl;
 	for (int i = 0; i < result.size(); i++) { 
         if(classNames[result[i].id]=="car"){
             int left=0, top=0;
