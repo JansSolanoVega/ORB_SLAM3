@@ -411,6 +411,25 @@ Frame::Frame(std::vector<OutputParams> detection, const cv::Mat &imGray, const d
     mTimeORB_Ext = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndExtORB - time_StartExtORB).count();
 #endif
 
+    cv::Mat mask = get_mask(imGray, detection);
+    int num_kpt = mvKeys.size();
+    std::vector<cv::KeyPoint> non_removed_mvKeys;
+    cv::Mat non_removed_mDescriptors;
+    int num_removed=0;
+    for(int i=0; i<num_kpt; i++){
+        int x_r = floor(mvKeys[i].pt.x);
+        int y_r = floor(mvKeys[i].pt.y);
+        if((int)mask.at<uchar>(mvKeys[i].pt.y,mvKeys[i].pt.x)>0){
+            num_removed+=1;
+        }
+        else {
+            non_removed_mvKeys.push_back(mvKeys[i]);
+            non_removed_mDescriptors.push_back(mDescriptors.row(i));
+        }
+    }
+    mvKeys = non_removed_mvKeys;
+    mDescriptors =non_removed_mDescriptors;
+    std::cout<<"# features removed:"<<num_removed<<std::endl;
 
     N = mvKeys.size();
     if(mvKeys.empty())
