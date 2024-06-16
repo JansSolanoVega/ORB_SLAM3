@@ -93,7 +93,7 @@ borrar/*
 */ExecMean.txt
 
 *.pdf
-*classes.txt
+classes.txt
 *.onnx
 KeyFrameTrajectory*.txt
 settings.json
