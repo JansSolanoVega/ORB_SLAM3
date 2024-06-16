@@ -5,7 +5,7 @@
 std::vector<std::string> load_class_list()
 {
     std::vector<std::string> class_list;
-    std::ifstream ifs("dynamic/classes.txt");
+    std::ifstream ifs("yolo/classes.txt");
     std::string line;
     while (getline(ifs, line))
     {
@@ -16,7 +16,7 @@ std::vector<std::string> load_class_list()
 
 void load_net(cv::dnn::Net &net, bool is_cuda)
 {
-    auto result = cv::dnn::readNet("dynamic/models/yolov5s.onnx");
+    auto result = cv::dnn::readNet("yolo/models/yolov5s.onnx");
     if (is_cuda)
     {
         std::cout << "Attempty to use CUDAA\n";
