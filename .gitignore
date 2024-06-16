@@ -91,3 +91,9 @@ my_settings.txt
 borrar/*
 
 */ExecMean.txt
+
+*.pdf
+*classes.txt
+*.onnx
+KeyFrameTrajectory*.txt
+settings.json
