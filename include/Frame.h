@@ -302,6 +302,8 @@ public:
 
     int mnDataset;
 
+    std::vector<OutputParams> frame_detection;
+
 #ifdef REGISTER_TIMES
     double mTimeORB_Ext;
     double mTimeStereoMatch;

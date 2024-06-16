@@ -30,7 +30,7 @@
 #include<mutex>
 #include <unordered_set>
 
-
+#include <YOLO.h>
 namespace ORB_SLAM3
 {
 
@@ -49,6 +49,7 @@ public:
     // Draw last processed frame.
     cv::Mat DrawFrame(float imageScale=1.f);
     cv::Mat DrawRightFrame(float imageScale=1.f);
+    void DrawYOLO(cv::Mat &img, std::vector<OutputParams> result, std::vector<std::string> classNames);
 
     bool both;
 
@@ -83,6 +84,8 @@ protected:
 
     map<long unsigned int, cv::Point2f> mmProjectPoints;
     map<long unsigned int, cv::Point2f> mmMatchedInImage;
+
+    std::vector<OutputParams> yolo_detection;
 
 };
 
