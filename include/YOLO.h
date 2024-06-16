@@ -22,15 +22,11 @@ public:
 
     std::vector<OutputParams> detect(cv::Mat& img);
     cv::Mat remove_masks(cv::Mat& img, std::vector<OutputParams> result);
-    
-    std::vector<std::string> classes;
 
 private:
     std::string model_path;
     cv::dnn::Net net;
     Yolov8Seg task;
-    
-
 };
 
 } //namespace ORB_SLAM

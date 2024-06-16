@@ -32,6 +32,13 @@ FrameDrawer::FrameDrawer(Atlas* pAtlas):both(false),mpAtlas(pAtlas)
     mState=Tracking::SYSTEM_NOT_READY;
     mIm = cv::Mat(480,640,CV_8UC3, cv::Scalar(0,0,0));
     mImRight = cv::Mat(480,640,CV_8UC3, cv::Scalar(0,0,0));
+    srand(time(0));
+    for (int i = 0; i < 80; i++) {
+        int b = rand() % 256;
+        int g = rand() % 256;
+        int r = rand() % 256;
+        info_yolo.color.push_back(cv::Scalar(b, g, r));
+    }
 }
 
 cv::Mat FrameDrawer::DrawFrame(float imageScale)
@@ -199,17 +206,40 @@ cv::Mat FrameDrawer::DrawFrame(float imageScale)
     DrawTextInfo(im,state, imWithInfo);
 
     //Drawing yolo detection
-    std::vector<std::string> classes = { "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
-		"fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow",
-		"elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
-		"skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard",
-		"tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
-		"sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
-		"potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone",
-		"microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear",
-		"hair drier", "toothbrush" };
-    DrawYOLO(imWithInfo, yolo_detection, classes);
+    DrawYOLO(imWithInfo, yolo_detection);
     return imWithInfo;
+}
+
+
+void FrameDrawer::DrawYOLO(cv::Mat &img, std::vector<OutputParams> result)
+{
+    cv::Mat mask = img.clone();
+    for (int i = 0; i < result.size(); i++) { 
+        if(info_yolo.classes_yolo[result[i].id]=="car"){
+            int left=0, top=0;
+            int color_num = i;
+            if (result[i].box.area() > 0) {
+                rectangle(img, result[i].box, info_yolo.color[result[i].id], 2, 8);
+                left = result[i].box.x;
+                top = result[i].box.y;
+            }
+            if (result[i].rotatedBox.size.width * result[i].rotatedBox.size.height > 0) {
+                DrawRotatedBox(img, result[i].rotatedBox, info_yolo.color[result[i].id], 2);
+                left = result[i].rotatedBox.center.x;
+                top = result[i].rotatedBox.center.y;
+            }
+            if (result[i].boxMask.rows && result[i].boxMask.cols > 0)
+                mask(result[i].box).setTo(info_yolo.color[result[i].id], result[i].boxMask);
+            std::string label = info_yolo.classes_yolo[result[i].id] + ":" + std::to_string(result[i].confidence);
+            int baseLine;
+            cv::Size labelSize = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+            top = MAX(top, labelSize.height);
+            putText(img, label, cv::Point(left, top), cv::FONT_HERSHEY_SIMPLEX, 1, info_yolo.color[result[i].id], 2);
+        }  
+        
+    }
+    cv::addWeighted(img, 0.5, mask, 0.5, 0, img); //add mask to src
+    
 }
 
 cv::Mat FrameDrawer::DrawRightFrame(float imageScale)
@@ -338,45 +368,6 @@ cv::Mat FrameDrawer::DrawRightFrame(float imageScale)
 }
 
 
-void FrameDrawer::DrawYOLO(cv::Mat &img, std::vector<OutputParams> result, std::vector<std::string> classNames)
-{
-    std::vector<cv::Scalar> color;
-	srand(time(0));
-	for (int i = 0; i < 80; i++) {
-		int b = rand() % 256;
-		int g = rand() % 256;
-		int r = rand() % 256;
-		color.push_back(cv::Scalar(b, g, r));
-	}
-    
-    cv::Mat mask = img.clone();
-	for (int i = 0; i < result.size(); i++) { 
-        if(classNames[result[i].id]=="car"){
-            int left=0, top=0;
-            int color_num = i;
-            if (result[i].box.area() > 0) {
-                rectangle(img, result[i].box, color[result[i].id], 2, 8);
-                left = result[i].box.x;
-                top = result[i].box.y;
-            }
-            if (result[i].rotatedBox.size.width * result[i].rotatedBox.size.height > 0) {
-                DrawRotatedBox(img, result[i].rotatedBox, color[result[i].id], 2);
-                left = result[i].rotatedBox.center.x;
-                top = result[i].rotatedBox.center.y;
-            }
-            if (result[i].boxMask.rows && result[i].boxMask.cols > 0)
-                mask(result[i].box).setTo(color[result[i].id], result[i].boxMask);
-            std::string label = classNames[result[i].id] + ":" + std::to_string(result[i].confidence);
-            int baseLine;
-            cv::Size labelSize = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-            top = MAX(top, labelSize.height);
-            putText(img, label, cv::Point(left, top), cv::FONT_HERSHEY_SIMPLEX, 1, color[result[i].id], 2);
-        }  
-        
-	}
-    cv::addWeighted(img, 0.5, mask, 0.5, 0, img); //add mask to src
-    
-}
 
 void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText)
 {

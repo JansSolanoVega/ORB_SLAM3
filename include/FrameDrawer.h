@@ -23,6 +23,7 @@
 #include "Tracking.h"
 #include "MapPoint.h"
 #include "Atlas.h"
+#include "yolov8_utils.h"
 
 #include<opencv2/core/core.hpp>
 #include<opencv2/features2d/features2d.hpp>
@@ -30,7 +31,6 @@
 #include<mutex>
 #include <unordered_set>
 
-#include <YOLO.h>
 namespace ORB_SLAM3
 {
 
@@ -49,7 +49,7 @@ public:
     // Draw last processed frame.
     cv::Mat DrawFrame(float imageScale=1.f);
     cv::Mat DrawRightFrame(float imageScale=1.f);
-    void DrawYOLO(cv::Mat &img, std::vector<OutputParams> result, std::vector<std::string> classNames);
+    void DrawYOLO(cv::Mat &img, std::vector<OutputParams> result);
 
     bool both;
 
@@ -86,7 +86,8 @@ protected:
     map<long unsigned int, cv::Point2f> mmMatchedInImage;
 
     std::vector<OutputParams> yolo_detection;
-
+    yolo_info info_yolo;
+    
 };
 
 } //namespace ORB_SLAM
