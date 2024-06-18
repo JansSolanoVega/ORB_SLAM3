@@ -95,3 +95,4 @@ borrar/*
 *.pdf
 KeyFrameTrajectory*.txt
 settings.json
+!/yolo/lib/
