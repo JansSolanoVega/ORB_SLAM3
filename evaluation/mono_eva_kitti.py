@@ -95,26 +95,22 @@ def align(model, data):  # cuz monocular obslam doesnt get scale
 
 
 if __name__ == "__main__":
-    sequence = 2
-    type = "monocular"
+    sequence = 0
+    type = "non_removal"
     sequence_txt = str(sequence).zfill(2)
     # Path to the times.txt in KITTI dataset
     ground_time = np.loadtxt(
-        "/home/zetans/VisualSLAM/kitti_dataset/sequences/"
-        + sequence_txt
-        + "/times.txt"
+        "/home/zetans/VisualSLAM/kitti_dataset/sequences/" + sequence_txt + "/times.txt"
     )
 
     # Path to the KeyFrameTrajectory.txt file
-    # res_time = np.loadtxt(
-    #     "/home/zetans/Dev/ORB_SLAM3/evaluation/KeyFrameTrajectory_"
-    #     + sequence_txt
-    #     + "_"
-    #     + type
-    #     + ".txt"
-    # )
     res_time = np.loadtxt(
-        "/home/zetans/Dev/ORB_SLAM3/evaluation/KeyFrameTrajectory_NonDynamic_Mono_02.txt"
+        "/home/zetans/Dev/ORB_SLAM3/evaluation/dynamic/KeyFrameTrajectory_"
+        + "sequence"
+        + sequence_txt
+        + "_"
+        + type
+        + ".txt"
     )
 
     # Path to the ground truth file
@@ -140,16 +136,39 @@ if __name__ == "__main__":
     aa = list(re_fpoints[2])
     y = aa[0].tolist()
 
-    print("compared_pose_pairs %d pairs" % (len(trans_error)))
-    print(
-        "absolute_translational_error.rmse %f m"
-        % np.sqrt(np.dot(trans_error, trans_error) / len(trans_error))
-    )
-    print("absolute_translational_error.mean %f m" % np.mean(trans_error))
-    print("absolute_translational_error.median %f m" % np.median(trans_error))
-    print("absolute_translational_error.std %f m" % np.std(trans_error))
-    print("absolute_translational_error.min %f m" % np.min(trans_error))
-    print("absolute_translational_error.max %f m" % np.max(trans_error))
+    import pandas as pd
+
+    data = {
+        "item": [
+            "num_pairs",
+            "absolute_translational_error.rmse",
+            "absolute_translational_error.mean",
+            "absolute_translational_error.median",
+            "absolute_translational_error.std",
+            "absolute_translational_error.min",
+            "absolute_translational_error.max",
+        ],
+        "value": [
+            len(trans_error),
+            np.sqrt(np.dot(trans_error, trans_error) / len(trans_error)),
+            np.mean(trans_error),
+            np.median(trans_error),
+            np.std(trans_error),
+            np.min(trans_error),
+            np.max(trans_error),
+        ],
+    }
+
+    # print("compared_pose_pairs %d pairs" % (len(trans_error)))
+    # print(
+    #     "absolute_translational_error.rmse %f m"
+    #     % np.sqrt(np.dot(trans_error, trans_error) / len(trans_error))
+    # )
+    # print("absolute_translational_error.mean %f m" % np.mean(trans_error))
+    # print("absolute_translational_error.median %f m" % np.median(trans_error))
+    # print("absolute_translational_error.std %f m" % np.std(trans_error))
+    # print("absolute_translational_error.min %f m" % np.min(trans_error))
+    # print("absolute_translational_error.max %f m" % np.max(trans_error))
 
     # for num in range(len(ground_points[0])):
     # 	plt.plot([ground_points[0][num], x[0][num]], [ground_points[2][num], y[0][num]], c = 'green')
@@ -161,9 +180,12 @@ if __name__ == "__main__":
         ncol=1,
         fontsize=8,
     )
-
+    df = pd.DataFrame(data)
+    filename = "evaluation/kitti_comparison_sequence" + sequence_txt + "_" + type
+    df.to_csv(filename + ".txt", header=None, index=None, sep=" ", mode="w")
+    print(df)
     plt.savefig(
-        "evaluation/kitti_comparison_" + sequence_txt + "_" + type + ".pdf",
+        filename + ".pdf",
         format="pdf",
     )
     plt.show()
