@@ -95,8 +95,8 @@ def align(model, data):  # cuz monocular obslam doesnt get scale
 
 
 if __name__ == "__main__":
-    sequence = 0
-    type = "non_removal"
+    sequence = 1
+    type = "removal"
     sequence_txt = str(sequence).zfill(2)
     # Path to the times.txt in KITTI dataset
     ground_time = np.loadtxt(
