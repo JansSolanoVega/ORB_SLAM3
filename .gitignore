@@ -97,3 +97,5 @@ KeyFrameTrajectory*.txt
 settings.json
 !/yolo/lib/
 evaluation/*.txt
+
+dynamic_detection_lstm/dataset
